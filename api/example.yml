@@ -1,0 +1,115 @@
+openapi: 3.1.0
+info:
+  title: Космические закусочные API
+  description: API для согласования новых продуктов в космической сети закусочных
+  version: 1.0.0
+
+servers:
+  - url: https://api.cosmos-snacks.com
+    description: Продуктовый API для космических закусочных
+
+paths:
+  /products:
+    post:
+      summary: Создать новый продукт
+      description: Добавление нового продукта в ассортимент космической закусочной.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Продукт успешно создан
+        '400':
+          description: Ошибка в запросе
+
+  /products/{productId}:
+    put:
+      summary: Обновить информацию о продукте
+      description: Редактирование информации о существующем продукте.
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          description: Идентификатор продукта для редактирования
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Информация о продукте успешно обновлена
+        '400':
+          description: Ошибка в запросе
+        '404':
+          description: Продукт не найден
+
+    delete:
+      summary: Удалить продукт
+      description: Удаление существующего продукта из ассортимента космической закусочной.
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          description: Идентификатор продукта для удаления
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Продукт успешно удален
+        '404':
+          description: Продукт не найден
+
+  /products/{productId}/status:
+    put:
+      summary: Управление статусом согласования продукта
+      description: Обновление статуса согласования продукта.
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          description: Идентификатор продукта
+          schema:
+            type: string
+        - in: query
+          name: status
+          required: true
+          description: Новый статус согласования (approved/rejected/pending)
+          schema:
+            type: string
+            enum: [approved, rejected, pending]
+      responses:
+        '200':
+          description: Статус согласования продукта успешно обновлен
+        '400':
+          description: Ошибка в запросе
+        '404':
+          description: Продукт не найден
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
+          type: string
+          description: Название нового продукта
+        price:
+          type: number
+          format: double
+          description: Цена нового продукта (в долларах)
+        description:
+          type: string
+          description: Описание нового продукта
+        category:
+          type: string
+          description: Категория нового продукта
