@@ -1,0 +1,26 @@
+@startuml
+
+participant "Пользователь" as User
+participant "Система" as System
+participant "Брокер сообщений" as MessageBroker
+
+User -> System: Создает новый продукт
+activate System
+System -> System: Сохраняет данные о продукте\nОжидает согласования
+System --> User: Возвращает сообщение о создании
+
+User -> System: Запрашивает согласование продукта
+activate System
+System -> System: Изменяет статус на 'pending'
+System --> User: Возвращает подтверждение
+
+User -> System: Одобряет продукт
+activate System
+System -> System: Изменяет статус на 'approved'\nГотовится к запуску
+System -> MessageBroker: Отправляет событие о запуске продукта
+activate MessageBroker
+MessageBroker --> System: Подтверждение получения события
+deactivate MessageBroker
+System --> User: Возвращает подтверждение
+
+@enduml
